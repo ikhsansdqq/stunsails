@@ -1,0 +1,57 @@
+[Unit]
+Description=Harbor: server and Docker monitor
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/server-monitor serve
+Environment=LISTEN=127.0.0.1:8099
+Environment=GOMEMLIMIT=48MiB
+Environment=COMPOSE_IMAGE=docker:29-cli
+Restart=on-failure
+RestartSec=5s
+
+# Runs as its own system user (install.sh creates it). The docker group is
+# root-equivalent: Harbor manages containers and runs compose through it, and
+# only after a password, an authenticator code, and a fresh code within five
+# minutes for every change. adm lets it read /var/log/auth.log for SSH sign-ins
+# and sudo. Not DynamicUser: dynamic users can't reach the system D-Bus, which
+# `systemctl --failed` needs.
+User=server-monitor
+Group=server-monitor
+SupplementaryGroups=docker adm
+RemoveIPC=yes
+RestrictSUIDSGID=yes
+StateDirectory=server-monitor
+# Written by `sudo server-monitor passwd` and `sudo server-monitor enroll`.
+LoadCredential=password:/etc/server-monitor/password
+LoadCredential=totp:/etc/server-monitor/totp
+UMask=0077
+
+# Compose runs in a helper container, so its memory isn't counted here.
+MemoryMax=96M
+CPUQuota=20%
+
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectProc=invisible
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target
