@@ -1,19 +1,26 @@
 #!/bin/sh
-# Builds Harbor: the dashboard with the host's Node, then a static Go binary in
-# the golang image (Go isn't installed on the host). Output: ./server-monitor
+# Builds Harbor: the dashboard in the node image, then a static Go binary in the
+# golang image (neither runs on the host, so no web/node_modules is left behind).
+# Output: ./server-monitor
 #   ./build.sh          web + binary
 #   ./build.sh go       binary only (reuses web/dist)
 #   ./build.sh test     go vet + go test
 set -eu
 cd "$(dirname "$0")"
 GO_IMAGE=golang:1.27
+NODE_IMAGE=node:24-alpine
 CACHE="$HOME/.cache/server-monitor-go"
-mkdir -p "$CACHE/mod" "$CACHE/build"
+NPM_CACHE="$HOME/.cache/server-monitor-npm"
+mkdir -p "$CACHE/mod" "$CACHE/build" "$NPM_CACHE"
 
 if [ "${1:-}" != "go" ] && [ "${1:-}" != "test" ]; then
 	# Stale bundles would otherwise pile up in the embedded dist/.
 	find web/dist -mindepth 1 ! -name .keep -delete
-	(cd web && { [ -d node_modules ] || npm ci; } && npm run build)
+	# node_modules lives only for this run; the npm cache keeps the next install fast.
+	sudo docker run --rm -u "$(id -u):$(id -g)" \
+		-e HOME=/tmp -e npm_config_cache=/cache \
+		-v "$NPM_CACHE:/cache" -v "$PWD/web:/web" -w /web "$NODE_IMAGE" \
+		sh -c 'trap "rm -rf node_modules" EXIT; npm ci --no-audit --no-fund && npm run build'
 fi
 
 go_run() {
