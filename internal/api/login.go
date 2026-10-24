@@ -17,7 +17,7 @@ func (s *Server) session(w http.ResponseWriter, r *http.Request) {
 	se, ok := s.current(r)
 	out := map[string]any{
 		"authenticated": ok,
-		"configured":    s.TOTP != nil && s.Password != "",
+		"configured":    viaSocket(r) || s.TOTP != nil && s.Password != "",
 	}
 	if ok {
 		out["stepup_until"] = se.stepUp.Add(StepUpWindow).Unix()
@@ -82,6 +82,10 @@ func (s *Server) triesLeft(msg, ip string) string {
 }
 
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
+	if viaSocket(r) {
+		signInElsewhere(w)
+		return
+	}
 	if s.TOTP == nil || s.Password == "" {
 		fail(w, http.StatusServiceUnavailable, "StunSails isn't set up yet. On the server run: sudo stunsails passwd, then sudo stunsails enroll.")
 		return
@@ -119,6 +123,10 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) loginTOTP(w http.ResponseWriter, r *http.Request) {
+	if viaSocket(r) {
+		signInElsewhere(w)
+		return
+	}
 	ip := clientIP(r)
 	if s.limited(w, r, ip) {
 		return
@@ -169,6 +177,10 @@ func (s *Server) loginTOTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) logout(w http.ResponseWriter, r *http.Request) {
+	if viaSocket(r) {
+		signInElsewhere(w)
+		return
+	}
 	if se, ok := s.current(r); ok {
 		s.Store.DeleteSession(se.hash)
 		s.audit(r, "login", "signed out", "", "", nil)
@@ -178,6 +190,10 @@ func (s *Server) logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) stepUp(w http.ResponseWriter, r *http.Request, se sess) {
+	if se.actor != "" {
+		signInElsewhere(w)
+		return
+	}
 	ip := clientIP(r)
 	if s.limited(w, r, ip) {
 		return
@@ -198,6 +214,10 @@ func (s *Server) stepUp(w http.ResponseWriter, r *http.Request, se sess) {
 }
 
 func (s *Server) sessions(w http.ResponseWriter, r *http.Request, se sess) {
+	if se.actor != "" {
+		signInElsewhere(w)
+		return
+	}
 	list, err := s.Store.Sessions(se.hash)
 	if err != nil {
 		fail(w, http.StatusInternalServerError, err.Error())
@@ -207,6 +227,10 @@ func (s *Server) sessions(w http.ResponseWriter, r *http.Request, se sess) {
 }
 
 func (s *Server) revokeOthers(w http.ResponseWriter, r *http.Request, se sess) {
+	if se.actor != "" {
+		signInElsewhere(w)
+		return
+	}
 	n, err := s.Store.DeleteOtherSessions(se.hash)
 	s.audit(r, "login", "signed out other sessions", "", fmt.Sprint(n), err)
 	if err != nil {

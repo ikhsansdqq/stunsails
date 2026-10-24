@@ -114,6 +114,8 @@ type Notifier struct {
 	cfg    Config
 	active map[string]*state
 	send   func(Message) error // replaced in tests
+	feed   []FeedItem          // the newest alerts, for a proxying app (Feed)
+	seq    int64
 }
 
 type state struct {
@@ -336,6 +338,7 @@ func (n *Notifier) IsActive(rule, target string) bool {
 
 // dispatch sends in the background and records the outcome in Activity.
 func (n *Notifier) dispatch(m Message) {
+	n.remember(m)
 	go func() {
 		err := n.Send(m)
 		if errors.Is(err, errNoChannel) {
