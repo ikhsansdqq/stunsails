@@ -99,6 +99,7 @@ func (s *Server) Handler() http.Handler {
 	mux.Handle("GET /api/sites/{host}/history", s.authed(s.siteHistory))
 	mux.Handle("GET /api/settings", s.authed(s.settings))
 	mux.Handle("GET /api/self", s.authed(s.self))
+	mux.Handle("GET /api/alerts/feed", s.authed(s.alertFeed))
 
 	// Changing. These also need a fresh authenticator code (step-up).
 	mux.Handle("POST /api/stepup", s.mutating(s.stepUp, false))
@@ -149,6 +150,7 @@ func headers(next http.Handler) http.Handler {
 type sess struct {
 	hash   string
 	stepUp time.Time
+	actor  string // who the app in front says is asking; "" for StunSails' own sessions
 }
 
 func (s *Server) cookieName() string {
@@ -165,6 +167,9 @@ func hashToken(t string) string {
 
 // current reads and refreshes the session cookie; ok is false when signed out.
 func (s *Server) current(r *http.Request) (sess, bool) {
+	if viaSocket(r) {
+		return s.proxied(r)
+	}
 	c, err := r.Cookie(s.cookieName())
 	if err != nil || len(c.Value) != 64 {
 		return sess{}, false
@@ -218,6 +223,9 @@ func (s *Server) mutating(h handler, stepUp bool) http.Handler {
 // clientIP trusts forwarding headers only from the local reverse proxy.
 // Cloudflare's header wins; otherwise the address Caddy appended last.
 func clientIP(r *http.Request) string {
+	if viaSocket(r) {
+		return proxyIP(r)
+	}
 	h, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		h = r.RemoteAddr
@@ -274,6 +282,11 @@ func (s *Server) audit(r *http.Request, typ, action, target, name string, err er
 	a := store.Activity{Kind: "audit", Type: typ, Action: action, Target: target, Name: name, IP: clientIP(r), OK: err == nil}
 	if err != nil {
 		a.Detail = err.Error()
+	}
+	if viaSocket(r) {
+		if se, ok := s.proxied(r); ok {
+			a.Detail = strings.TrimSpace(a.Detail + " (by " + se.actor + ")")
+		}
 	}
 	s.Store.AddActivity(a)
 }

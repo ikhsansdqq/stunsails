@@ -23,7 +23,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"os/user"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -204,10 +206,61 @@ func serve() error {
 		defer cancel()
 		hs.Shutdown(sctx)
 	}()
+	if path := os.Getenv("SOCKET"); path != "" {
+		if err := serveSocket(ctx, srv, path); err != nil {
+			return fmt.Errorf("socket: %w", err)
+		}
+	}
+	if addr == "off" {
+		<-ctx.Done()
+		return nil
+	}
 	log.Printf("stunsails listening on %s", addr)
 	if err := hs.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
+	return nil
+}
+
+// serveSocket also serves the API on a unix socket for one local app that
+// signs people in itself (api/proxy.go). SOCKET_ALLOW_UIDS lists the user ids
+// that may connect; SOCKET_GROUP, a group name or id, owns the socket file.
+func serveSocket(ctx context.Context, srv *api.Server, path string) error {
+	var allow []int
+	for _, f := range strings.FieldsFunc(os.Getenv("SOCKET_ALLOW_UIDS"), func(r rune) bool { return r == ',' || r == ' ' }) {
+		uid, err := strconv.Atoi(f)
+		if err != nil {
+			return fmt.Errorf("SOCKET_ALLOW_UIDS: %q isn't a user id", f)
+		}
+		allow = append(allow, uid)
+	}
+	gid := -1
+	if g := os.Getenv("SOCKET_GROUP"); g != "" {
+		if n, err := strconv.Atoi(g); err == nil {
+			gid = n
+		} else if grp, err := user.LookupGroup(g); err == nil {
+			gid, _ = strconv.Atoi(grp.Gid)
+		} else {
+			return fmt.Errorf("SOCKET_GROUP: %w", err)
+		}
+	}
+	ln, err := api.SocketListener(path, gid, allow)
+	if err != nil {
+		return err
+	}
+	ss := &http.Server{Handler: srv.SocketHandler(), ReadHeaderTimeout: 10 * time.Second, IdleTimeout: 2 * time.Minute}
+	go func() {
+		<-ctx.Done()
+		sctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		ss.Shutdown(sctx)
+	}()
+	go func() {
+		if err := ss.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Printf("socket: %v", err)
+		}
+	}()
+	log.Printf("stunsails also listening on %s for uid %v", path, allow)
 	return nil
 }
 
