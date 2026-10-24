@@ -118,7 +118,7 @@ function Sidebar({ mobile, onNavigate }: { mobile: boolean; onNavigate?: () => v
         </p>
       )}
       {/* The AGPL asks that everyone using StunSails over the network can get its source. */}
-      <a href="https://github.com/stunsails/stunsails" target="_blank" rel="noreferrer" className="truncate px-5 pb-2 text-xs text-muted-foreground hover:text-foreground">
+      <a href="https://github.com/ikhsansdqq/stunsails" target="_blank" rel="noreferrer" className="truncate px-5 pb-2 text-xs text-muted-foreground hover:text-foreground">
         Source code · AGPL-3.0
       </a>
       <div className="flex flex-col gap-px border-t px-2.5 py-2">

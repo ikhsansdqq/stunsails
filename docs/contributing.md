@@ -36,7 +36,7 @@ cd docs && npm install && npm run docs:dev
 ## License
 
 The code is released under the GNU AGPL v3 or later. Before your first pull
-request is merged, you sign the [Contributor License Agreement](https://github.com/stunsails/stunsails/blob/main/CLA.md)
+request is merged, you sign the [Contributor License Agreement](https://github.com/ikhsansdqq/stunsails/blob/main/CLA.md)
 once: you keep the copyright in your work, and the project may also release it
 under other terms (for example in the hosted service). A bot asks you on the
 pull request.

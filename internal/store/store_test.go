@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stunsails/stunsails/internal/host"
+	"github.com/ikhsansdqq/stunsails/internal/host"
 )
 
 func TestForecast(t *testing.T) {

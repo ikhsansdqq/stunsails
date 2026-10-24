@@ -21,7 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stunsails/stunsails/internal/store"
+	"github.com/ikhsansdqq/stunsails/internal/store"
 )
 
 // Rules an owner can switch on or off.

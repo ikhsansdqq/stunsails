@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/stunsails/stunsails/internal/auth"
-	"github.com/stunsails/stunsails/internal/store"
+	"github.com/ikhsansdqq/stunsails/internal/auth"
+	"github.com/ikhsansdqq/stunsails/internal/store"
 )
 
 const pendingTTL = 5 * time.Minute

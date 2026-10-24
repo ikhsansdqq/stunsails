@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stunsails/stunsails/internal/docker"
-	"github.com/stunsails/stunsails/internal/host"
+	"github.com/ikhsansdqq/stunsails/internal/docker"
+	"github.com/ikhsansdqq/stunsails/internal/host"
 )
 
 func TestLoopDetection(t *testing.T) {

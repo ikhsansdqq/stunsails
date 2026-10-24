@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stunsails/stunsails/internal/alert"
-	"github.com/stunsails/stunsails/internal/docker"
-	"github.com/stunsails/stunsails/internal/host"
+	"github.com/ikhsansdqq/stunsails/internal/alert"
+	"github.com/ikhsansdqq/stunsails/internal/docker"
+	"github.com/ikhsansdqq/stunsails/internal/host"
 )
 
 // LoopWindow and LoopDies: a container that died this many times within the

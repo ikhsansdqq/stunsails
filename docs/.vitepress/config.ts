@@ -1,7 +1,7 @@
 import { defineConfig } from "vitepress";
 
 // The public repository. Change this one line when the repo moves.
-const repo = "https://github.com/stunsails/stunsails";
+const repo = "https://github.com/ikhsansdqq/stunsails";
 
 export default defineConfig({
   title: "StunSails",

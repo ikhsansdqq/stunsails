@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stunsails/stunsails/internal/compose"
-	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/ikhsansdqq/stunsails/internal/compose"
+	"github.com/ikhsansdqq/stunsails/internal/docker"
 )
 
 func jsonLine(v any) ([]byte, error) { return json.Marshal(v) }

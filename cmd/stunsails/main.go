@@ -2,15 +2,21 @@
 // every Docker container and compose stack on it, and lets its owner manage
 // them behind a password and an authenticator code.
 //
-//	stunsails serve    run the dashboard (what systemd starts)
-//	stunsails passwd   set the sign-in password
-//	stunsails enroll   pair a new authenticator app
+//	stunsails serve      run the dashboard (what systemd starts)
+//	stunsails init       install or upgrade the service on this server, step by step
+//	stunsails doctor     check the server and the installed service
+//	stunsails upgrade    install the latest release, rolling back if it fails
+//	stunsails uninstall  remove the service (--purge also deletes its data)
+//	stunsails passwd     set the sign-in password
+//	stunsails enroll     pair a new authenticator app
+//	stunsails version    print the version
 package main
 
 import (
 	"bufio"
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"io/fs"
 	"log"
@@ -25,22 +31,26 @@ import (
 	"golang.org/x/term"
 	"rsc.io/qr"
 
-	"github.com/stunsails/stunsails/internal/alert"
-	"github.com/stunsails/stunsails/internal/api"
-	"github.com/stunsails/stunsails/internal/auth"
-	"github.com/stunsails/stunsails/internal/cleanup"
-	"github.com/stunsails/stunsails/internal/collector"
-	"github.com/stunsails/stunsails/internal/compose"
-	"github.com/stunsails/stunsails/internal/docker"
-	"github.com/stunsails/stunsails/internal/geo"
-	"github.com/stunsails/stunsails/internal/host"
-	"github.com/stunsails/stunsails/internal/hostlog"
-	"github.com/stunsails/stunsails/internal/store"
-	"github.com/stunsails/stunsails/internal/uptime"
-	"github.com/stunsails/stunsails/web"
+	"github.com/ikhsansdqq/stunsails/internal/alert"
+	"github.com/ikhsansdqq/stunsails/internal/api"
+	"github.com/ikhsansdqq/stunsails/internal/auth"
+	"github.com/ikhsansdqq/stunsails/internal/cleanup"
+	"github.com/ikhsansdqq/stunsails/internal/collector"
+	"github.com/ikhsansdqq/stunsails/internal/compose"
+	"github.com/ikhsansdqq/stunsails/internal/docker"
+	"github.com/ikhsansdqq/stunsails/internal/geo"
+	"github.com/ikhsansdqq/stunsails/internal/host"
+	"github.com/ikhsansdqq/stunsails/internal/hostlog"
+	"github.com/ikhsansdqq/stunsails/internal/setup"
+	"github.com/ikhsansdqq/stunsails/internal/store"
+	"github.com/ikhsansdqq/stunsails/internal/uptime"
+	"github.com/ikhsansdqq/stunsails/web"
 )
 
 const confDir = "/etc/stunsails"
+
+// version is set at build time with -ldflags "-X main.version=…".
+var version = "dev"
 
 func env(k, def string) string {
 	if v := os.Getenv(k); v != "" {
@@ -61,10 +71,41 @@ func main() {
 		err = serve()
 	case "passwd":
 		err = passwd(env("PASSWORD_FILE", filepath.Join(confDir, "password")))
+	case "version", "--version":
+		fmt.Println("stunsails", version)
+		return
 	case "enroll":
 		err = enroll(env("TOTP_FILE", filepath.Join(confDir, "totp")), len(os.Args) > 2 && os.Args[2] == "--show")
+	case "init":
+		fl := flag.NewFlagSet("init", flag.ExitOnError)
+		yes := fl.Bool("yes", false, "accept every default without asking")
+		noDocker := fl.Bool("no-docker-install", false, "stop instead of installing Docker Engine")
+		domain := fl.String("domain", "", "domain for the reverse proxy snippet")
+		binary := fl.String("binary", "", "binary to install (default: this one)")
+		fl.Parse(os.Args[2:])
+		err = setup.Init(setup.NewUI(*yes), setup.Options{Binary: *binary, NoDockerInstall: *noDocker, Domain: *domain, Passwd: passwd, Enroll: enrollNew})
+	case "doctor":
+		ui := setup.NewUI(false)
+		ui.Say("This server:")
+		ok := setup.Print(ui.Out, setup.Host())
+		ui.Say("StunSails %s:", version)
+		if !setup.Print(ui.Out, setup.Installed(env("LISTEN", setup.Listen))) || !ok {
+			os.Exit(1)
+		}
+	case "upgrade":
+		fl := flag.NewFlagSet("upgrade", flag.ExitOnError)
+		to := fl.String("version", "", "release to install (default: the latest)")
+		force := fl.Bool("force", false, "reinstall even when already on that version")
+		fl.Parse(os.Args[2:])
+		err = setup.Upgrade(setup.NewUI(false), version, *to, *force)
+	case "uninstall":
+		fl := flag.NewFlagSet("uninstall", flag.ExitOnError)
+		yes := fl.Bool("yes", false, "don't ask")
+		purge := fl.Bool("purge", false, "also delete history, activity, credentials and the service user")
+		fl.Parse(os.Args[2:])
+		err = setup.Uninstall(setup.NewUI(*yes), *purge)
 	default:
-		err = fmt.Errorf("unknown command %q (serve, passwd, enroll)", cmd)
+		err = fmt.Errorf("unknown command %q (serve, init, doctor, upgrade, uninstall, passwd, enroll, version)", cmd)
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -227,6 +268,8 @@ func passwd(path string) error {
 	fmt.Fprintf(os.Stderr, "Saved to %s. Restart to apply: sudo systemctl restart stunsails\n", path)
 	return nil
 }
+
+func enrollNew(path string) error { return enroll(path, false) }
 
 func enroll(path string, show bool) error {
 	if show {

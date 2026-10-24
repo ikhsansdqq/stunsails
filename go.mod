@@ -1,4 +1,4 @@
-module github.com/stunsails/stunsails
+module github.com/ikhsansdqq/stunsails
 
 go 1.27
 

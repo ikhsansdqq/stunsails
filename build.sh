@@ -43,5 +43,7 @@ if [ "${1:-}" = "test" ]; then
 	go_run 'out=$(gofmt -l cmd internal web/embed.go); if [ -n "$out" ]; then echo "gofmt needed:"; echo "$out"; exit 1; fi; go vet ./... && go test ./...'
 	exit
 fi
-go_run "go build -trimpath -ldflags='-s -w' -o stunsails ./cmd/stunsails"
+# git runs here, on the host: the golang image has no checkout metadata to read.
+VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo dev)
+go_run "go build -trimpath -ldflags='-s -w -X main.version=$VERSION' -o stunsails ./cmd/stunsails"
 ls -lh stunsails

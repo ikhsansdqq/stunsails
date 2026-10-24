@@ -1,6 +1,6 @@
 # systemd unit
 
-`deploy/stunsails.service` runs StunSails as its own system user inside a
+`deploy/stunsails.service.tmpl` (installed by `stunsails init`) runs StunSails as its own system user inside a
 tight sandbox. This page explains each choice so you can judge it, or loosen
 one line with a drop-in (`sudo systemctl edit stunsails`) when your setup
 needs it.
