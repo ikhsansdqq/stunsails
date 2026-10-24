@@ -21,8 +21,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/stunsails/stunsails/internal/docker"
-	"github.com/stunsails/stunsails/internal/store"
+	"github.com/ikhsansdqq/stunsails/internal/docker"
+	"github.com/ikhsansdqq/stunsails/internal/store"
 )
 
 type Stack struct {

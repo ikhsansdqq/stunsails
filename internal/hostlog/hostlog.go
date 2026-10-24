@@ -19,8 +19,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/stunsails/stunsails/internal/alert"
-	"github.com/stunsails/stunsails/internal/store"
+	"github.com/ikhsansdqq/stunsails/internal/alert"
+	"github.com/ikhsansdqq/stunsails/internal/store"
 )
 
 // Line is one interesting auth.log entry.

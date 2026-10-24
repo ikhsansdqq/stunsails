@@ -1,10 +1,11 @@
+# Rendered by `stunsails init` from deploy/stunsails.service.tmpl.
 [Unit]
 Description=StunSails: server and Docker monitor
 After=network-online.target docker.service
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/stunsails serve
+ExecStart={{.Exec}} serve
 Environment=LISTEN=127.0.0.1:8099
 Environment=GOMEMLIMIT=48MiB
 Environment=COMPOSE_IMAGE=docker:29-cli
@@ -15,11 +16,13 @@ RestartSec=5s
 # root-equivalent: StunSails manages containers and runs compose through it, and
 # only after a password, an authenticator code, and a fresh code within five
 # minutes for every change. adm lets it read /var/log/auth.log for SSH sign-ins
-# and sudo. Not DynamicUser: dynamic users can't reach the system D-Bus, which
+# and sudo; systemd-journal lets it read the journal on systems without that file.
+# `stunsails init` lists only the groups that exist here: systemd refuses to
+# start a unit that names a missing one. Not DynamicUser: dynamic users can't reach the system D-Bus, which
 # `systemctl --failed` needs.
 User=stunsails
 Group=stunsails
-SupplementaryGroups=docker adm
+SupplementaryGroups={{.Groups}}
 RemoveIPC=yes
 RestrictSUIDSGID=yes
 StateDirectory=stunsails

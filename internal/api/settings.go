@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/stunsails/stunsails/internal/alert"
-	"github.com/stunsails/stunsails/internal/cleanup"
-	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/ikhsansdqq/stunsails/internal/alert"
+	"github.com/ikhsansdqq/stunsails/internal/cleanup"
+	"github.com/ikhsansdqq/stunsails/internal/docker"
 )
 
 func (s *Server) settings(w http.ResponseWriter, r *http.Request, _ sess) {

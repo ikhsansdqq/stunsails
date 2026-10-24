@@ -11,8 +11,8 @@ import (
 	"testing/fstest"
 	"time"
 
-	"github.com/stunsails/stunsails/internal/auth"
-	"github.com/stunsails/stunsails/internal/store"
+	"github.com/ikhsansdqq/stunsails/internal/auth"
+	"github.com/ikhsansdqq/stunsails/internal/store"
 )
 
 func newServer(t *testing.T) (*Server, *auth.TOTP, *time.Time) {

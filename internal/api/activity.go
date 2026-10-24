@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/stunsails/stunsails/internal/geo"
-	"github.com/stunsails/stunsails/internal/store"
+	"github.com/ikhsansdqq/stunsails/internal/geo"
+	"github.com/ikhsansdqq/stunsails/internal/store"
 )
 
 func activityQuery(r *http.Request) store.ActivityQuery {

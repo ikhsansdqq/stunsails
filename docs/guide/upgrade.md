@@ -3,16 +3,25 @@
 ## Upgrade
 
 ```sh
-cd stunsails
-git pull
-./build.sh
-sudo ./deploy/install.sh
+sudo stunsails upgrade                  # the latest release
+sudo stunsails upgrade --version v0.2.0 # a given one
 ```
 
-The installer keeps your password, authenticator and data. It saves the
-previous binary and unit as `.prev` before replacing them.
+`upgrade` downloads the release, checks its checksum (and its signature when
+`cosign` is installed), keeps the current binary and unit as `.prev`, swaps in
+the new binary and restarts. If the new version doesn't answer within 15
+seconds, it puts the old one back on its own.
 
-## Roll back
+Your password, authenticator and data are kept. Installed from a `.deb` or
+`.rpm`? Upgrade with `apt` or `dnf` instead.
+
+From a checkout:
+
+```sh
+git pull && ./build.sh && sudo ./deploy/install.sh
+```
+
+## Roll back by hand
 
 ```sh
 sudo cp /usr/local/bin/stunsails.prev /usr/local/bin/stunsails
@@ -22,18 +31,22 @@ sudo systemctl daemon-reload && sudo systemctl restart stunsails
 
 ## Uninstall
 
+```sh
+sudo stunsails uninstall
+```
+
+This stops and removes the service and binary. It keeps `/var/lib/stunsails`
+and `/etc/stunsails`, so `sudo stunsails init` later picks up where you left
+off.
+
 ::: danger
-The last two commands delete StunSails' history, activity log and credentials.
-They cannot be undone.
+`--purge` also deletes the history, activity log, password, authenticator key
+and the service user. It cannot be undone.
 :::
 
 ```sh
-sudo systemctl disable --now stunsails
-sudo rm /etc/systemd/system/stunsails.service /usr/local/bin/stunsails*
-sudo systemctl daemon-reload
-sudo userdel stunsails
-sudo rm -r /var/lib/stunsails /etc/stunsails
+sudo stunsails uninstall --purge
 ```
 
-Your containers and stacks keep running. StunSails only manages them; it does not
-own them.
+Your containers and stacks keep running. StunSails only manages them; it does
+not own them.
