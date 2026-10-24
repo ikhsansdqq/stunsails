@@ -1,4 +1,4 @@
-// Package store keeps Harbor's history in SQLite: one-minute host and
+// Package store keeps StunSails' history in SQLite: one-minute host and
 // container readings, the activity feed (Docker events and sign-ins/actions),
 // sessions, and the compose stacks seen so far.
 package store
@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"server-monitor/internal/host"
+	"github.com/stunsails/stunsails/internal/host"
 
 	_ "modernc.org/sqlite"
 )

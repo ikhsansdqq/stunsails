@@ -1,4 +1,4 @@
-// Package auth holds Harbor's sign-in pieces: the password hash, the
+// Package auth holds StunSails' sign-in pieces: the password hash, the
 // authenticator (TOTP) secret, and the per-address limit on failed tries.
 package auth
 

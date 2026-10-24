@@ -20,7 +20,7 @@ export function Notice({ tone, title, children }: { tone: "red" | "amber"; title
 /** Why a load failed, in words that tell a slow connection apart from a refusal. */
 export function loadFailure(error: unknown): string {
   if (error instanceof TimeoutError) return "The connection timed out. Nothing is lost; try again, or wait for a better signal.";
-  if (error instanceof TypeError) return "We couldn't reach Harbor. Check your connection and try again.";
+  if (error instanceof TypeError) return "We couldn't reach StunSails. Check your connection and try again.";
   return error instanceof Error ? error.message : "Something went wrong.";
 }
 

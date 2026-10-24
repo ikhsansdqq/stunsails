@@ -41,7 +41,7 @@ export function SettingsPage() {
   const others = (sessions.data ?? []).filter((s) => !s.current).length;
   return (
     <>
-      <PageHeader title="Settings" sub="Alerts, cleanup, who is signed in, and what Harbor itself costs the server." />
+      <PageHeader title="Settings" sub="Alerts, cleanup, who is signed in, and what StunSails itself costs the server." />
       <div className="space-y-6">
         {settings.data && <Alerts initial={settings.data.alerts} />}
         {settings.data && <Cleanup initial={settings.data.cleanup} />}
@@ -90,13 +90,13 @@ export function SettingsPage() {
         </Block>
         <Section title="Sign-in" sub="A password, then a code from Google Authenticator. Changes need a fresh code every five minutes.">
           <ul className="space-y-2 text-sm">
-            <li>Change the password: {cmd("sudo server-monitor passwd")}, then {cmd("sudo systemctl restart server-monitor")}.</li>
-            <li>Pair a new phone (the old one stops working): {cmd("sudo server-monitor enroll")}, then restart.</li>
-            <li>Add a second phone with the same key: {cmd("sudo server-monitor enroll --show")}.</li>
+            <li>Change the password: {cmd("sudo stunsails passwd")}, then {cmd("sudo systemctl restart stunsails")}.</li>
+            <li>Pair a new phone (the old one stops working): {cmd("sudo stunsails enroll")}, then restart.</li>
+            <li>Add a second phone with the same key: {cmd("sudo stunsails enroll --show")}.</li>
             <li>Five wrong tries from one address lock it out for 15 minutes. Every attempt is in Activity.</li>
           </ul>
           {settings.data?.auth_log_error && (
-            <p className="mt-3 text-sm text-warning">Server sign-ins can't be read: {settings.data.auth_log_error}. Reinstall with the deploy script, which adds Harbor to the adm group.</p>
+            <p className="mt-3 text-sm text-warning">Server sign-ins can't be read: {settings.data.auth_log_error}. Reinstall with the deploy script, which adds StunSails to the adm group.</p>
           )}
         </Section>
         <Section title="Appearance" sub="Kept in this browser.">
@@ -197,7 +197,7 @@ function Alerts({ initial }: { initial: AlertsConfig }) {
   return (
     <Section
       title="Alerts"
-      sub="Harbor tells you when something breaks, once, and again when it's fixed. The same problem stays quiet for 30 minutes."
+      sub="StunSails tells you when something breaks, once, and again when it's fixed. The same problem stays quiet for 30 minutes."
       actions={
         <Button size="sm" variant="outline" icon={Send} disabled={!anyOn} onClick={() => void run(() => api.testAlert(), { success: "Test alert sent. Check your inbox or channel." })}>
           Send a test
@@ -249,7 +249,7 @@ function Alerts({ initial }: { initial: AlertsConfig }) {
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="From" htmlFor="smtp-from">
-              <Input id="smtp-from" placeholder="harbor@yourdomain.com" value={smtp.from} onChange={(e) => set("from", e.target.value)} />
+              <Input id="smtp-from" placeholder="stunsails@yourdomain.com" value={smtp.from} onChange={(e) => set("from", e.target.value)} />
             </Field>
             <Field label="To" htmlFor="smtp-to" hint="Several? Separate with commas.">
               <Input id="smtp-to" placeholder="you@yourdomain.com" value={to} onChange={(e) => setTo(e.target.value)} />
@@ -277,7 +277,7 @@ function Alerts({ initial }: { initial: AlertsConfig }) {
           <Field
             label="URL"
             htmlFor="hook-url"
-            hint={cfg.webhook.url_set ? `Saved (${cfg.webhook.host}). Leave empty to keep it.` : "Discord, Slack, ntfy or n8n: Harbor posts JSON with content and text fields they read as is."}
+            hint={cfg.webhook.url_set ? `Saved (${cfg.webhook.host}). Leave empty to keep it.` : "Discord, Slack, ntfy or n8n: StunSails posts JSON with content and text fields they read as is."}
           >
             <Input id="hook-url" type="url" placeholder={cfg.webhook.url_set ? `https://${cfg.webhook.host}/…` : "https://discord.com/api/webhooks/…"} value={hookUrl} onChange={(e) => setHookUrl(e.target.value)} />
           </Field>
@@ -400,7 +400,7 @@ function Cleanup({ initial }: { initial: CleanupConfig }) {
           onClick={() =>
             void run(() => api.saveCleanup(c), {
               confirm: c.enabled
-                ? { title: `Clean up every ${days[c.weekday]} at ${String(c.hour).padStart(2, "0")}:00?`, description: `Harbor will delete ${what || "nothing"} each week without asking.`, confirmLabel: "Save schedule", tone: "default" }
+                ? { title: `Clean up every ${days[c.weekday]} at ${String(c.hour).padStart(2, "0")}:00?`, description: `StunSails will delete ${what || "nothing"} each week without asking.`, confirmLabel: "Save schedule", tone: "default" }
                 : undefined,
               success: c.enabled ? "Cleanup scheduled" : "Weekly cleanup off",
               invalidate: [["settings"]],
@@ -414,7 +414,7 @@ function Cleanup({ initial }: { initial: CleanupConfig }) {
   );
 }
 
-/** What Harbor itself costs the server. */
+/** What StunSails itself costs the server. */
 function Footprint() {
   const self = useQuery({ queryKey: ["self"], queryFn: api.self, refetchInterval: 10_000 });
   const s = self.data;
@@ -422,7 +422,7 @@ function Footprint() {
   const mem = s.mem_current ?? s.rss;
   const max = s.mem_max && s.mem_max > 0 ? s.mem_max : 0;
   return (
-    <Section title="Harbor itself" sub={`What watching this server costs it. Up ${formatDuration(s.uptime_sec)}.`}>
+    <Section title="StunSails itself" sub={`What watching this server costs it. Up ${formatDuration(s.uptime_sec)}.`}>
       <StatRow>
         <Meter label="Memory" value={formatBytes(mem)} percent={max ? pct(mem, max) : 0} hint={max ? `of its ${formatBytes(max)} limit; peak ${formatBytes(s.mem_peak ?? s.rss_peak)}` : `peak ${formatBytes(s.rss_peak)}`} />
         <Stat label="CPU" value={s.cpu_pct !== undefined ? `${s.cpu_pct.toFixed(2)}%` : "—"} note={`of one core; ${(s.cpu_sec ?? 0).toFixed(1)} s in total`} />

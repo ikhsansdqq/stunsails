@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"server-monitor/internal/host"
+	"github.com/stunsails/stunsails/internal/host"
 )
 
 func TestForecast(t *testing.T) {

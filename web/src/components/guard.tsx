@@ -91,7 +91,7 @@ export interface RunOptions<T> {
 }
 
 /**
- * Runs a change the way every Harbor button does: confirm when asked, prompt for a
+ * Runs a change the way every StunSails button does: confirm when asked, prompt for a
  * fresh code if the server wants one, toast the outcome, refetch what it touched.
  * Resolves to the result, or undefined if cancelled or failed.
  */

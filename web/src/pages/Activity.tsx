@@ -24,7 +24,7 @@ const kinds: { id: Kind; label: string }[] = [
   { id: "", label: "Everything" },
   { id: "docker", label: "Docker" },
   { id: "host", label: "Server" },
-  { id: "audit", label: "Harbor" },
+  { id: "audit", label: "StunSails" },
   { id: "alert", label: "Alerts" },
 ];
 
@@ -139,7 +139,7 @@ export function ActivityPage() {
 
   return (
     <>
-      <PageHeader title="Activity" sub="What Docker reported, who signed in to the server, what was done through Harbor, and every alert sent. Kept for 30 days." />
+      <PageHeader title="Activity" sub="What Docker reported, who signed in to the server, what was done through StunSails, and every alert sent. Kept for 30 days." />
       <Block title="Feed" sub={page.data ? `${total.toLocaleString()} ${total === 1 ? "entry" : "entries"}. Open one for its addresses and where they are.` : undefined}>
         {page.error ? (
           <p className="text-sm text-critical">{page.error.message}</p>

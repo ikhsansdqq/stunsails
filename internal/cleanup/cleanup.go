@@ -1,5 +1,5 @@
 // Package cleanup prunes what Docker no longer needs on a weekly schedule the
-// owner sets in Harbor, and on demand.
+// owner sets in StunSails, and on demand.
 package cleanup
 
 import (
@@ -12,9 +12,9 @@ import (
 	"sync"
 	"time"
 
-	"server-monitor/internal/alert"
-	"server-monitor/internal/docker"
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/alert"
+	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 type Config struct {

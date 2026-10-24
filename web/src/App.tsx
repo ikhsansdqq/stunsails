@@ -36,8 +36,8 @@ function Gate() {
   const session = useQuery({ queryKey: ["session"], queryFn: api.session, staleTime: 60_000 });
   useEffect(() => {
     const out = () => qc.invalidateQueries({ queryKey: ["session"] });
-    addEventListener("harbor:signed-out", out);
-    return () => removeEventListener("harbor:signed-out", out);
+    addEventListener("stunsails:signed-out", out);
+    return () => removeEventListener("stunsails:signed-out", out);
   }, [qc]);
   if (session.isPending) return null;
   if (!session.data?.authenticated) return <Login configured={session.data?.configured ?? true} />;

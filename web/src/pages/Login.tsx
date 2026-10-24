@@ -4,13 +4,13 @@ import { toast } from "sonner";
 import { CornerDownLeft, Eye, EyeOff, LoaderCircle } from "@/components/ui/lucide";
 import { OtpInput } from "@/components/ui/otp-input";
 import { api } from "@/lib/api";
-import { HarborMark } from "@/components/Layout";
+import { StunSailsMark } from "@/components/Layout";
 import { useNow } from "@/hooks/use-now";
 import "./login.css";
 
 // Sign-in as a console session: one centred prompt that takes the password, then
 // the code from Google Authenticator. It follows the system's light or dark theme
-// with Harbor's own tokens; the status bar along the foot is the only ornament.
+// with StunSails' own tokens; the status bar along the foot is the only ornament.
 
 export function Login({ configured }: { configured: boolean }) {
   const queryClient = useQueryClient();
@@ -46,8 +46,8 @@ export function Login({ configured }: { configured: boolean }) {
       <main className="tl-main">
         <div className="tl-col">
           <p className="tl-brand">
-            <HarborMark className="tl-mark" />
-            <span>Harbor</span>
+            <StunSailsMark className="tl-mark" />
+            <span>StunSails</span>
             <span className="tl-host">{location.hostname}</span>
           </p>
 
@@ -57,14 +57,14 @@ export function Login({ configured }: { configured: boolean }) {
                 <span className="tl-sigil" aria-hidden>
                   $
                 </span>{" "}
-                sign in<span className="sr-only"> to Harbor</span>
+                sign in<span className="sr-only"> to StunSails</span>
                 <span className="tl-cursor" aria-hidden />
               </h1>
-              <p className="tl-help">Enter your Harbor password. Your authenticator code comes next.</p>
+              <p className="tl-help">Enter your StunSails password. Your authenticator code comes next.</p>
 
               {!configured && (
                 <p className="tl-error" role="alert">
-                  Harbor isn't set up yet. On the server run <code>sudo server-monitor passwd</code> and <code>sudo server-monitor enroll</code>, then restart it.
+                  StunSails isn't set up yet. On the server run <code>sudo stunsails passwd</code> and <code>sudo stunsails enroll</code>, then restart it.
                 </p>
               )}
 
@@ -123,7 +123,7 @@ export function Login({ configured }: { configured: boolean }) {
                 </span>{" "}
                 verify authenticator code
               </h1>
-              <p className="tl-help">Enter the 6-digit code Google Authenticator shows for Harbor.</p>
+              <p className="tl-help">Enter the 6-digit code Google Authenticator shows for StunSails.</p>
               <div className="tl-otp">
                 <OtpInput
                   id="login-code"
@@ -149,7 +149,7 @@ export function Login({ configured }: { configured: boolean }) {
                 />
               </div>
               <p className="tl-help">
-                Lost the phone? On the server run <code>sudo server-monitor enroll</code> to pair a new one.{" "}
+                Lost the phone? On the server run <code>sudo stunsails enroll</code> to pair a new one.{" "}
                 <button type="button" className="tl-link" onClick={backToPassword}>
                   Back to password
                 </button>
@@ -176,7 +176,7 @@ function StatusBar({ step }: { step: "password" | "code" }) {
         <i />
         <i />
       </span>
-      <span className="tl-seg tl-seg-strong">harbor</span>
+      <span className="tl-seg tl-seg-strong">stunsails</span>
       <span className="tl-seg">{step === "password" ? "1/2 password" : "2/2 authenticator"}</span>
       <span className="tl-seg tl-wide">{location.protocol === "https:" ? "encrypted connection" : "local connection"}</span>
       <span className="tl-seg tl-time num">{time}</span>

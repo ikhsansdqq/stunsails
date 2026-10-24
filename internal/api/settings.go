@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"server-monitor/internal/alert"
-	"server-monitor/internal/cleanup"
-	"server-monitor/internal/docker"
+	"github.com/stunsails/stunsails/internal/alert"
+	"github.com/stunsails/stunsails/internal/cleanup"
+	"github.com/stunsails/stunsails/internal/docker"
 )
 
 func (s *Server) settings(w http.ResponseWriter, r *http.Request, _ sess) {
@@ -132,7 +132,7 @@ type selfSample struct {
 	at   time.Time
 }
 
-// self is Harbor's own footprint: what it costs the server to watch it.
+// self is StunSails' own footprint: what it costs the server to watch it.
 func (s *Server) self(w http.ResponseWriter, r *http.Request, _ sess) {
 	status := procStatus("/proc/self/status")
 	out := map[string]any{
@@ -146,13 +146,13 @@ func (s *Server) self(w http.ResponseWriter, r *http.Request, _ sess) {
 	runtime.ReadMemStats(&ms)
 	out["go_heap"] = ms.HeapAlloc
 	out["go_sys"] = ms.Sys
-	// Memory as systemd accounts it (with page cache), when Harbor runs as its service.
+	// Memory as systemd accounts it (with page cache), when StunSails runs as its service.
 	if cg := selfCgroup(); strings.HasSuffix(cg, ".service") {
 		out["mem_current"] = readInt(cg + "/memory.current")
 		out["mem_peak"] = readInt(cg + "/memory.peak")
 		out["mem_max"] = readInt(cg + "/memory.max")
 	}
-	// CPU from the process's own counters, so it's right however Harbor was started.
+	// CPU from the process's own counters, so it's right however StunSails was started.
 	if cpu, ok := procCPU("/proc/self/stat"); ok {
 		usec := uint64(cpu.Microseconds())
 		now := s.now()

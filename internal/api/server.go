@@ -1,4 +1,4 @@
-// Package api is Harbor's HTTP surface: the JSON API the dashboard calls and
+// Package api is StunSails' HTTP surface: the JSON API the dashboard calls and
 // the embedded single-page app.
 package api
 
@@ -14,17 +14,17 @@ import (
 	"sync"
 	"time"
 
-	"server-monitor/internal/alert"
-	"server-monitor/internal/auth"
-	"server-monitor/internal/cleanup"
-	"server-monitor/internal/collector"
-	"server-monitor/internal/compose"
-	"server-monitor/internal/docker"
-	"server-monitor/internal/geo"
-	"server-monitor/internal/host"
-	"server-monitor/internal/hostlog"
-	"server-monitor/internal/store"
-	"server-monitor/internal/uptime"
+	"github.com/stunsails/stunsails/internal/alert"
+	"github.com/stunsails/stunsails/internal/auth"
+	"github.com/stunsails/stunsails/internal/cleanup"
+	"github.com/stunsails/stunsails/internal/collector"
+	"github.com/stunsails/stunsails/internal/compose"
+	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/stunsails/stunsails/internal/geo"
+	"github.com/stunsails/stunsails/internal/host"
+	"github.com/stunsails/stunsails/internal/hostlog"
+	"github.com/stunsails/stunsails/internal/store"
+	"github.com/stunsails/stunsails/internal/uptime"
 )
 
 // StepUpWindow is how long a fresh authenticator code unlocks changes.
@@ -153,9 +153,9 @@ type sess struct {
 
 func (s *Server) cookieName() string {
 	if s.Secure {
-		return "__Host-harbor"
+		return "__Host-stunsails"
 	}
-	return "harbor"
+	return "stunsails"
 }
 
 func hashToken(t string) string {
@@ -198,13 +198,13 @@ func (s *Server) authed(h handler) http.Handler {
 	})
 }
 
-// mutating guards changes: a session, the X-Harbor header (a page on another
-// site can't set it without a CORS preflight, which Harbor never answers), and
+// mutating guards changes: a session, the X-StunSails header (a page on another
+// site can't set it without a CORS preflight, which StunSails never answers), and
 // when stepUp is set, an authenticator code entered within StepUpWindow.
 func (s *Server) mutating(h handler, stepUp bool) http.Handler {
 	return s.authed(func(w http.ResponseWriter, r *http.Request, se sess) {
-		if r.Header.Get("X-Harbor") != "1" {
-			fail(w, http.StatusForbidden, "missing X-Harbor header")
+		if r.Header.Get("X-StunSails") != "1" {
+			fail(w, http.StatusForbidden, "missing X-StunSails header")
 			return
 		}
 		if stepUp && s.now().Sub(se.stepUp) > StepUpWindow {

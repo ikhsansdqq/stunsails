@@ -6,7 +6,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Tokens copied from freelance-dashboard (src/style.css), so Harbor reads as part of the
+/* Tokens copied from freelance-dashboard (src/style.css), so StunSails reads as part of the
    same family: warm paper and sand, black ink for primary actions, the pixel-band orange
    as the only accent. Charts draw in --chart (orange); status colours (good, warning,
    critical) keep their meaning. shadcn names, so the copied components stay as they are. */

@@ -20,9 +20,16 @@ const (
 	LabelEnvFile    = "com.docker.compose.project.environment_file"
 	LabelOneoff     = "com.docker.compose.oneoff"
 	LabelDependsOn  = "com.docker.compose.depends_on"
-	// LabelHelper marks Harbor's own throwaway compose runners, hidden everywhere.
-	LabelHelper = "harbor.helper"
+	// LabelHelper marks StunSails' own throwaway compose runners, hidden everywhere.
+	LabelHelper = "stunsails.helper"
+	// labelHelperHarbor marked them before the rename to StunSails.
+	labelHelperHarbor = "harbor.helper"
 )
+
+// IsHelper reports whether labels mark one of StunSails' compose runners.
+func IsHelper(labels map[string]string) bool {
+	return labels[LabelHelper] != "" || labels[labelHelperHarbor] != ""
+}
 
 type Port struct {
 	IP      string `json:"ip,omitempty"`
@@ -64,7 +71,7 @@ func health(status string) string {
 	return m[1]
 }
 
-// Containers lists every container, running or not, except Harbor's helpers.
+// Containers lists every container, running or not, except StunSails' helpers.
 func (c *Client) Containers(ctx context.Context, all bool) ([]Container, error) {
 	var raw []struct {
 		ID      string `json:"Id"`
@@ -96,7 +103,7 @@ func (c *Client) Containers(ctx context.Context, all bool) ([]Container, error) 
 	}
 	out := make([]Container, 0, len(raw))
 	for _, r := range raw {
-		if r.Labels[LabelHelper] != "" {
+		if IsHelper(r.Labels) {
 			continue
 		}
 		ct := Container{

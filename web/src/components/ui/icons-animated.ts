@@ -1,4 +1,4 @@
-// The animated icons Harbor uses, re-exported from one place so the lazy import in
+// The animated icons StunSails uses, re-exported from one place so the lazy import in
 // ./icons.tsx bundles only these, not the whole animateicons set.
 export {
   ActivityIcon,

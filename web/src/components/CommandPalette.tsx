@@ -120,7 +120,7 @@ function Palette({ close }: { close: () => void }) {
     <Command loop label="Go to or run">
       <div className="flex items-center gap-3 border-b px-5">
         <Search size={20} className="shrink-0 text-muted-foreground" aria-hidden />
-        <Command.Input autoFocus placeholder="Go to a container, stack or page, or run an action…" aria-label="Search Harbor" className="h-14 w-full bg-transparent text-base outline-none placeholder:text-muted-foreground" />
+        <Command.Input autoFocus placeholder="Go to a container, stack or page, or run an action…" aria-label="Search StunSails" className="h-14 w-full bg-transparent text-base outline-none placeholder:text-muted-foreground" />
         <kbd className="hidden shrink-0 rounded border bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground sm:inline">Esc</kbd>
       </div>
       <Command.List className="max-h-[min(60vh,30rem)] scroll-py-2 overflow-y-auto overscroll-contain px-2.5 pb-2.5">

@@ -1,6 +1,10 @@
+/stunsails
 /server-monitor
 /bin/
 web/node_modules/
 web/dist/*
 !web/dist/.keep
 *.db
+docs/node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/

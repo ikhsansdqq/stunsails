@@ -11,11 +11,11 @@ import (
 	"sync"
 	"time"
 
-	"server-monitor/internal/alert"
-	"server-monitor/internal/cgroup"
-	"server-monitor/internal/docker"
-	"server-monitor/internal/host"
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/alert"
+	"github.com/stunsails/stunsails/internal/cgroup"
+	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/stunsails/stunsails/internal/host"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 const (
@@ -285,7 +285,7 @@ func (c *Collector) CtrRing(id string) []CtrPoint {
 // noisy actions fire constantly (health-check execs, attaches, log copies) and
 // would drown the feed; network connect/disconnect repeats every start and stop.
 func keep(e docker.Event) bool {
-	if e.Attrs[docker.LabelHelper] != "" {
+	if docker.IsHelper(e.Attrs) {
 		return false
 	}
 	a := e.Action

@@ -1,7 +1,7 @@
 /*
  * Sign-in as a console session. One centred column holds a prompt line and a single
  * input; a tmux-style status line runs along the foot, opening with the pixel band's
- * five colours. Everything reads Harbor's tokens (src/style.css), so the page follows
+ * five colours. Everything reads StunSails' tokens (src/style.css), so the page follows
  * the system's light or dark theme like the rest of the app. Scoped to .tl.
  */
 .tl {

@@ -11,8 +11,8 @@ import (
 	"testing/fstest"
 	"time"
 
-	"server-monitor/internal/auth"
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/auth"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 func newServer(t *testing.T) (*Server, *auth.TOTP, *time.Time) {
@@ -73,7 +73,7 @@ func TestLoginFlowAndGuards(t *testing.T) {
 	}
 	var sc []*http.Cookie
 	for _, c := range w.Result().Cookies() {
-		if c.Name == "__Host-harbor" {
+		if c.Name == "__Host-stunsails" {
 			if !c.HttpOnly || !c.Secure || c.SameSite != http.SameSiteStrictMode {
 				t.Fatal("session cookie flags wrong")
 			}
@@ -99,14 +99,14 @@ func TestLoginFlowAndGuards(t *testing.T) {
 	}
 	// …and a code from the last five minutes. Sign-in counts, so move past it.
 	*now = now.Add(6 * time.Minute)
-	w = do(h, "POST", "/api/prune/images", "", sc, map[string]string{"X-Harbor": "1"})
+	w = do(h, "POST", "/api/prune/images", "", sc, map[string]string{"X-StunSails": "1"})
 	if w.Code != 403 || !strings.Contains(w.Body.String(), "stepup_required") {
 		t.Fatalf("stale step-up: %d %s", w.Code, w.Body)
 	}
-	if w := do(h, "POST", "/api/stepup", `{"code":"`+codes.Code(*now)+`"}`, sc, map[string]string{"X-Harbor": "1"}); w.Code != 200 {
+	if w := do(h, "POST", "/api/stepup", `{"code":"`+codes.Code(*now)+`"}`, sc, map[string]string{"X-StunSails": "1"}); w.Code != 200 {
 		t.Fatalf("step-up: %d %s", w.Code, w.Body)
 	}
-	if w := do(h, "DELETE", "/api/networks/bridge", "", sc, map[string]string{"X-Harbor": "1"}); w.Code != 409 {
+	if w := do(h, "DELETE", "/api/networks/bridge", "", sc, map[string]string{"X-StunSails": "1"}); w.Code != 409 {
 		t.Fatalf("after step-up, built-in network refusal expected: %d %s", w.Code, w.Body)
 	}
 

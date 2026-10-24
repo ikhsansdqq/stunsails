@@ -30,10 +30,10 @@ const nav: NavItem[] = [
 ];
 const settingsItem: NavItem = { href: "/settings", label: "Settings", icon: Settings, match: (p) => p.startsWith("/settings") };
 
-/** Harbor's mark: the pixel band's orange as rising bars on black. */
-export function HarborMark({ className }: { className?: string }) {
+/** StunSails' mark: the pixel band's orange as rising bars on black. */
+export function StunSailsMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" className={cn("harbor-mark shrink-0", className)} aria-hidden>
+    <svg viewBox="0 0 32 32" className={cn("stunsails-mark shrink-0", className)} aria-hidden>
       <rect width="32" height="32" rx="7" className="fill-foreground" />
       <g fill="#ff8205">
         <rect x="6" y="20" width="4" height="6" rx="1" />
@@ -99,9 +99,9 @@ function Sidebar({ mobile, onNavigate }: { mobile: boolean; onNavigate?: () => v
   return (
     <aside aria-label="Primary navigation" className={cn("flex h-dvh w-60 shrink-0 flex-col overflow-hidden border-r bg-sidebar", mobile ? "" : "sticky top-0 hidden lg:flex")}>
       <div className="flex h-14 shrink-0 items-center gap-1 border-b px-2.5">
-        <Link href="/" onClick={onNavigate} aria-label="Harbor, overview" className="flex min-w-0 flex-1 items-center gap-2 rounded-md p-1.5 outline-none hover:bg-sidebar-hover focus-visible:ring-[3px] focus-visible:ring-ring/50">
-          <HarborMark className="size-6" />
-          <span className="truncate text-sm font-semibold tracking-[-0.01em]">Harbor</span>
+        <Link href="/" onClick={onNavigate} aria-label="StunSails, overview" className="flex min-w-0 flex-1 items-center gap-2 rounded-md p-1.5 outline-none hover:bg-sidebar-hover focus-visible:ring-[3px] focus-visible:ring-ring/50">
+          <StunSailsMark className="size-6" />
+          <span className="truncate text-sm font-semibold tracking-[-0.01em]">StunSails</span>
         </Link>
         {mobile && (
           <button type="button" onClick={onNavigate} aria-label="Close navigation" className="grid size-7 place-items-center rounded-md text-muted-foreground hover:bg-sidebar-hover hover:text-foreground">
@@ -117,6 +117,10 @@ function Sidebar({ mobile, onNavigate }: { mobile: boolean; onNavigate?: () => v
           {overview.data.info.hostname} · Docker {overview.data.docker.version || "?"}
         </p>
       )}
+      {/* The AGPL asks that everyone using StunSails over the network can get its source. */}
+      <a href="https://github.com/stunsails/stunsails" target="_blank" rel="noreferrer" className="truncate px-5 pb-2 text-xs text-muted-foreground hover:text-foreground">
+        Source code · AGPL-3.0
+      </a>
       <div className="flex flex-col gap-px border-t px-2.5 py-2">
         {link(settingsItem)}
         <button type="button" className={sidebarRow} onClick={toggleTheme}>
@@ -145,7 +149,7 @@ export function Layout({ children }: { children: ReactNode }) {
     setOpen(false);
   }
   useEffect(() => {
-    document.title = crumb.title ? `${crumb.title} · Harbor` : "Harbor";
+    document.title = crumb.title ? `${crumb.title} · StunSails` : "StunSails";
   }, [crumb.title]);
 
   return (

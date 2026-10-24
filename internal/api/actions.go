@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"server-monitor/internal/compose"
-	"server-monitor/internal/docker"
+	"github.com/stunsails/stunsails/internal/compose"
+	"github.com/stunsails/stunsails/internal/docker"
 )
 
 func jsonLine(v any) ([]byte, error) { return json.Marshal(v) }
@@ -106,7 +106,7 @@ func (s *Server) stackAction(w http.ResponseWriter, r *http.Request, _ sess) {
 		return
 	}
 	if !st.Manageable {
-		fail(w, http.StatusConflict, "Harbor doesn't know where this stack's compose file is.")
+		fail(w, http.StatusConflict, "StunSails doesn't know where this stack's compose file is.")
 		return
 	}
 	w.Header().Set("Content-Type", "application/x-ndjson")

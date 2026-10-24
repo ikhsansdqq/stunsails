@@ -1,5 +1,5 @@
-// Harbor's API: JSON over same-origin fetch with the session cookie. Every change
-// carries X-Harbor (the server refuses changes without it) and may answer
+// StunSails' API: JSON over same-origin fetch with the session cookie. Every change
+// carries X-StunSails (the server refuses changes without it) and may answer
 // "stepup_required", which the StepUp provider turns into a code prompt.
 
 export class TimeoutError extends Error {
@@ -26,7 +26,7 @@ async function request<T>(method: string, path: string, body?: unknown, timeoutM
     res = await fetch(path, {
       method,
       credentials: "same-origin",
-      headers: { ...(body !== undefined ? { "Content-Type": "application/json" } : {}), ...(method !== "GET" ? { "X-Harbor": "1" } : {}) },
+      headers: { ...(body !== undefined ? { "Content-Type": "application/json" } : {}), ...(method !== "GET" ? { "X-StunSails": "1" } : {}) },
       body: body !== undefined ? JSON.stringify(body) : undefined,
       signal: ctl.signal,
     });
@@ -39,7 +39,7 @@ async function request<T>(method: string, path: string, body?: unknown, timeoutM
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     if (res.status === 401 && path !== "/api/login" && path !== "/api/login/totp" && path !== "/api/stepup") {
-      dispatchEvent(new Event("harbor:signed-out"));
+      dispatchEvent(new Event("stunsails:signed-out"));
     }
     throw new ApiError(data.error || res.statusText, res.status, data.code);
   }
@@ -415,7 +415,7 @@ export interface ActivityQuery {
 
 /** A compose run's output, line by line; resolves when it ends. */
 export async function streamStack(project: string, verb: StackVerb, onLine: (line: string) => void): Promise<void> {
-  const res = await fetch(`/api/stacks/${enc(project)}/${verb}`, { method: "POST", credentials: "same-origin", headers: { "X-Harbor": "1" } });
+  const res = await fetch(`/api/stacks/${enc(project)}/${verb}`, { method: "POST", credentials: "same-origin", headers: { "X-StunSails": "1" } });
   if (!res.ok || !res.body) {
     const data = await res.json().catch(() => ({}));
     throw new ApiError(data.error || res.statusText, res.status, data.code);

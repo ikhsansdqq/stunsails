@@ -1,4 +1,4 @@
-module server-monitor
+module github.com/stunsails/stunsails
 
 go 1.27
 

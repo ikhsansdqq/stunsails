@@ -136,7 +136,7 @@ export function HostCharts({ range }: { range: Range }) {
   const rows = history.data ?? [];
   const times = rows.map((r) => r.at);
   return (
-    <Section title="Server" sub={rows.length < 2 && !history.isPending ? "Readings start when Harbor starts; the charts fill in over the next minute." : rangeSub[range]}>
+    <Section title="Server" sub={rows.length < 2 && !history.isPending ? "Readings start when StunSails starts; the charts fill in over the next minute." : rangeSub[range]}>
       <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
         {charts.map((c) => {
           const values = rows.map(c.value);

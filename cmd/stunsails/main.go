@@ -1,10 +1,10 @@
-// Command server-monitor is Harbor: one small service that watches the VPS and
+// Command stunsails is StunSails: one small service that watches the VPS and
 // every Docker container and compose stack on it, and lets its owner manage
 // them behind a password and an authenticator code.
 //
-//	server-monitor serve    run the dashboard (what systemd starts)
-//	server-monitor passwd   set the sign-in password
-//	server-monitor enroll   pair a new authenticator app
+//	stunsails serve    run the dashboard (what systemd starts)
+//	stunsails passwd   set the sign-in password
+//	stunsails enroll   pair a new authenticator app
 package main
 
 import (
@@ -25,22 +25,22 @@ import (
 	"golang.org/x/term"
 	"rsc.io/qr"
 
-	"server-monitor/internal/alert"
-	"server-monitor/internal/api"
-	"server-monitor/internal/auth"
-	"server-monitor/internal/cleanup"
-	"server-monitor/internal/collector"
-	"server-monitor/internal/compose"
-	"server-monitor/internal/docker"
-	"server-monitor/internal/geo"
-	"server-monitor/internal/host"
-	"server-monitor/internal/hostlog"
-	"server-monitor/internal/store"
-	"server-monitor/internal/uptime"
-	"server-monitor/web"
+	"github.com/stunsails/stunsails/internal/alert"
+	"github.com/stunsails/stunsails/internal/api"
+	"github.com/stunsails/stunsails/internal/auth"
+	"github.com/stunsails/stunsails/internal/cleanup"
+	"github.com/stunsails/stunsails/internal/collector"
+	"github.com/stunsails/stunsails/internal/compose"
+	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/stunsails/stunsails/internal/geo"
+	"github.com/stunsails/stunsails/internal/host"
+	"github.com/stunsails/stunsails/internal/hostlog"
+	"github.com/stunsails/stunsails/internal/store"
+	"github.com/stunsails/stunsails/internal/uptime"
+	"github.com/stunsails/stunsails/web"
 )
 
-const confDir = "/etc/server-monitor"
+const confDir = "/etc/stunsails"
 
 func env(k, def string) string {
 	if v := os.Getenv(k); v != "" {
@@ -94,7 +94,10 @@ func credential(name, fileEnv string) string {
 
 func serve() error {
 	dataDir := env("STATE_DIRECTORY", env("DATA_DIR", "."))
-	st, err := store.Open(filepath.Join(dataDir, "harbor.db"))
+	if err := renameLegacyDB(dataDir); err != nil {
+		return err
+	}
+	st, err := store.Open(filepath.Join(dataDir, "stunsails.db"))
 	if err != nil {
 		return fmt.Errorf("open state: %w", err)
 	}
@@ -106,11 +109,11 @@ func serve() error {
 			return err
 		}
 	} else {
-		log.Print("no authenticator secret yet: run `sudo server-monitor enroll`")
+		log.Print("no authenticator secret yet: run `sudo stunsails enroll`")
 	}
 	pw := credential("password", "PASSWORD_FILE")
 	if pw == "" {
-		log.Print("no password yet: run `sudo server-monitor passwd`")
+		log.Print("no password yet: run `sudo stunsails passwd`")
 	}
 
 	dc := docker.New(env("DOCKER_SOCKET", "/var/run/docker.sock"))
@@ -160,10 +163,29 @@ func serve() error {
 		defer cancel()
 		hs.Shutdown(sctx)
 	}()
-	log.Printf("harbor listening on %s", addr)
+	log.Printf("stunsails listening on %s", addr)
 	if err := hs.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
+	return nil
+}
+
+// renameLegacyDB moves the database from before the rename to StunSails
+// (harbor.db, with its WAL and shared-memory files) to its new name, once.
+func renameLegacyDB(dir string) error {
+	newDB, oldDB := filepath.Join(dir, "stunsails.db"), filepath.Join(dir, "harbor.db")
+	if _, err := os.Stat(newDB); err == nil {
+		return nil
+	}
+	if _, err := os.Stat(oldDB); err != nil {
+		return nil
+	}
+	for _, suffix := range []string{"-wal", "-shm", ""} { // the main file last
+		if err := os.Rename(oldDB+suffix, newDB+suffix); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			return fmt.Errorf("rename old database: %w", err)
+		}
+	}
+	log.Print("renamed harbor.db to stunsails.db")
 	return nil
 }
 
@@ -202,7 +224,7 @@ func passwd(path string) error {
 	if err := writePrivate(path, h+"\n"); err != nil {
 		return err
 	}
-	fmt.Fprintf(os.Stderr, "Saved to %s. Restart to apply: sudo systemctl restart server-monitor\n", path)
+	fmt.Fprintf(os.Stderr, "Saved to %s. Restart to apply: sudo systemctl restart stunsails\n", path)
 	return nil
 }
 
@@ -230,7 +252,7 @@ func enroll(path string, show bool) error {
 			if err := writePrivate(path, secret+"\n"); err != nil {
 				return err
 			}
-			fmt.Fprintf(os.Stderr, "Paired. Saved to %s. Restart to apply: sudo systemctl restart server-monitor\n", path)
+			fmt.Fprintf(os.Stderr, "Paired. Saved to %s. Restart to apply: sudo systemctl restart stunsails\n", path)
 			return nil
 		}
 		fmt.Fprintln(os.Stderr, "That code doesn't match. Check the phone's clock and try again.")
@@ -240,7 +262,7 @@ func enroll(path string, show bool) error {
 
 func printQR(secret string) {
 	host, _ := os.Hostname()
-	uri := auth.URI(secret, "Harbor", host)
+	uri := auth.URI(secret, "StunSails", host)
 	code, err := qr.Encode(uri, qr.M)
 	if err == nil {
 		// Two modules per character cell, light on dark with a quiet zone, so it scans in any terminal theme.

@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"server-monitor/internal/auth"
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/auth"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 const pendingTTL = 5 * time.Minute
@@ -83,7 +83,7 @@ func (s *Server) triesLeft(msg, ip string) string {
 
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	if s.TOTP == nil || s.Password == "" {
-		fail(w, http.StatusServiceUnavailable, "Harbor isn't set up yet. On the server run: sudo server-monitor passwd, then sudo server-monitor enroll.")
+		fail(w, http.StatusServiceUnavailable, "StunSails isn't set up yet. On the server run: sudo stunsails passwd, then sudo stunsails enroll.")
 		return
 	}
 	ip := clientIP(r)
@@ -113,7 +113,7 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	}
 	s.pending[hashToken(tok)] = pendingLogin{ip: ip, exp: now.Add(pendingTTL)}
 	s.mu.Unlock()
-	http.SetCookie(w, &http.Cookie{Name: "harbor_pending", Value: tok, Path: "/api/login", HttpOnly: true, Secure: s.Secure,
+	http.SetCookie(w, &http.Cookie{Name: "stunsails_pending", Value: tok, Path: "/api/login", HttpOnly: true, Secure: s.Secure,
 		SameSite: http.SameSiteStrictMode, MaxAge: int(pendingTTL.Seconds())})
 	writeJSON(w, http.StatusOK, map[string]string{"next": "totp"})
 }
@@ -123,7 +123,7 @@ func (s *Server) loginTOTP(w http.ResponseWriter, r *http.Request) {
 	if s.limited(w, r, ip) {
 		return
 	}
-	c, err := r.Cookie("harbor_pending")
+	c, err := r.Cookie("stunsails_pending")
 	if err != nil || s.TOTP == nil {
 		fail(w, http.StatusUnauthorized, "Enter your password first.")
 		return
@@ -162,7 +162,7 @@ func (s *Server) loginTOTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.audit(r, "login", "signed in", "", "", nil)
-	http.SetCookie(w, &http.Cookie{Name: "harbor_pending", Value: "", Path: "/api/login", MaxAge: -1, HttpOnly: true, Secure: s.Secure})
+	http.SetCookie(w, &http.Cookie{Name: "stunsails_pending", Value: "", Path: "/api/login", MaxAge: -1, HttpOnly: true, Secure: s.Secure})
 	http.SetCookie(w, &http.Cookie{Name: s.cookieName(), Value: tok, Path: "/", HttpOnly: true, Secure: s.Secure,
 		SameSite: http.SameSiteStrictMode, MaxAge: int((7 * 24 * time.Hour).Seconds())})
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})

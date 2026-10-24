@@ -27,7 +27,7 @@ export function ActivityDetail({ entry }: { entry: Activity }) {
             , city-level and approximate.
           </>
         ) : (
-          "Locations show once the location database finishes downloading, a few minutes after Harbor starts."
+          "Locations show once the location database finishes downloading, a few minutes after StunSails starts."
         )}
       </p>
     </div>
@@ -36,7 +36,7 @@ export function ActivityDetail({ entry }: { entry: Activity }) {
 
 function FailedLogins({ d }: { d: Detail }) {
   const attempts = d.sources.reduce((n, s) => n + (s.attempts ?? 0), 0);
-  // Entries written before Harbor kept every address only name the top three.
+  // Entries written before StunSails kept every address only name the top three.
   const partial = /\+\d+ more/.test(d.detail ?? "") && d.sources.length <= 3;
   // A summary covers the ten minutes before it was written.
   const from = (d.at - 600) * 1000;
@@ -56,7 +56,7 @@ function FailedLogins({ d }: { d: Detail }) {
       <p className="text-sm">
         {partial ? (
           <>
-            {d.name} between <span className="num">{formatTime(from)}</span> and <span className="num">{formatTime(d.at * 1000)}</span>. This entry is from before Harbor kept every address, so
+            {d.name} between <span className="num">{formatTime(from)}</span> and <span className="num">{formatTime(d.at * 1000)}</span>. This entry is from before StunSails kept every address, so
             only the busiest three are listed.
           </>
         ) : (

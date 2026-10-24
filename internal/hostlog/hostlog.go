@@ -19,8 +19,8 @@ import (
 	"syscall"
 	"time"
 
-	"server-monitor/internal/alert"
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/alert"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 // Line is one interesting auth.log entry.
@@ -40,7 +40,7 @@ var (
 	sudoRe     = regexp.MustCompile(`sudo:\s+(\S+) : .*COMMAND=(.*)$`)
 )
 
-// Parse reads one auth.log line; ok is false for lines Harbor ignores.
+// Parse reads one auth.log line; ok is false for lines StunSails ignores.
 // An "Invalid user" line is followed by a "Failed … for invalid user" line
 // when a password was tried; only the Invalid line is counted, so each
 // attempt counts once whichever way it ended.

@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"server-monitor/internal/alert"
-	"server-monitor/internal/docker"
-	"server-monitor/internal/host"
+	"github.com/stunsails/stunsails/internal/alert"
+	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/stunsails/stunsails/internal/host"
 )
 
 // LoopWindow and LoopDies: a container that died this many times within the
@@ -137,7 +137,7 @@ func (c *Collector) evaluate(now time.Time, hs host.Sample, ctrs []docker.Contai
 		h.mu.Unlock()
 		if c.Alerts != nil {
 			if days >= 0 && days < 7 {
-				c.Alerts.Fire(alert.RuleDisk, "forecast", fmt.Sprintf("Disk full in about %.0f days", days), "At last week's pace the disk fills within a week. Clean up in Harbor's Storage page.", "warning")
+				c.Alerts.Fire(alert.RuleDisk, "forecast", fmt.Sprintf("Disk full in about %.0f days", days), "At last week's pace the disk fills within a week. Clean up in StunSails' Storage page.", "warning")
 			} else {
 				c.Alerts.Resolve(alert.RuleDisk, "forecast", "Disk growth slowed down")
 			}
@@ -165,14 +165,14 @@ func (c *Collector) evaluate(now time.Time, hs host.Sample, ctrs []docker.Contai
 		}
 	}
 	if memHigh >= 30 {
-		c.Alerts.Fire(alert.RuleMemory, "memory", fmt.Sprintf("Memory at %.0f%%", memPct), "Over 90% for five minutes. See the busiest containers in Harbor.", "warning")
+		c.Alerts.Fire(alert.RuleMemory, "memory", fmt.Sprintf("Memory at %.0f%%", memPct), "Over 90% for five minutes. See the busiest containers in StunSails.", "warning")
 	} else if memHigh == 0 {
 		c.Alerts.Resolve(alert.RuleMemory, "memory", "Memory is back under 85%")
 	}
 	if hs.DiskTotal > 0 {
 		diskPct := float64(hs.DiskUsed) / float64(hs.DiskTotal) * 100
 		if diskPct > 90 {
-			c.Alerts.Fire(alert.RuleDisk, "/", fmt.Sprintf("Disk %.0f%% full", diskPct), "Free space in Harbor's Storage page: build cache and unused images are the usual culprits.", "critical")
+			c.Alerts.Fire(alert.RuleDisk, "/", fmt.Sprintf("Disk %.0f%% full", diskPct), "Free space in StunSails' Storage page: build cache and unused images are the usual culprits.", "critical")
 		} else if diskPct < 88 {
 			c.Alerts.Resolve(alert.RuleDisk, "/", "Disk is back under 88%")
 		}

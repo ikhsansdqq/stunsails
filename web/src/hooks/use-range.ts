@@ -11,13 +11,13 @@ export const rangeOptions: { id: Range; label: string }[] = [
 /** The chart range, remembered across pages. */
 export function useRange(): [Range, (r: Range) => void] {
   const [r, set] = useState<Range>(() => {
-    const v = readStored("harbor:range");
+    const v = readStored("stunsails:range");
     return v === "24h" || v === "7d" ? v : "1h";
   });
   return [
     r,
     (next) => {
-      writeStored("harbor:range", next);
+      writeStored("stunsails:range", next);
       set(next);
     },
   ];

@@ -68,7 +68,7 @@ export function StackPage({ project }: { project: string }) {
             icon={Trash2}
             onClick={async () => {
               const ok = await guard(() => api.forgetStack(s.project), {
-                confirm: { title: `Forget ${s.project}?`, description: "Harbor stops listing it. Nothing on disk changes; it comes back the next time it's started with docker compose." },
+                confirm: { title: `Forget ${s.project}?`, description: "StunSails stops listing it. Nothing on disk changes; it comes back the next time it's started with docker compose." },
                 success: `Forgot ${s.project}`,
                 invalidate: [["stacks"]],
               });
@@ -81,7 +81,7 @@ export function StackPage({ project }: { project: string }) {
       </PageHeader>
       <div className="space-y-4">
         {!s.manageable && (
-          <Notice tone="amber" title="Harbor can't run compose for this stack">
+          <Notice tone="amber" title="StunSails can't run compose for this stack">
             Its containers don't say where the compose file lives. Bring it up once with docker compose on the server, and the actions appear.
           </Notice>
         )}

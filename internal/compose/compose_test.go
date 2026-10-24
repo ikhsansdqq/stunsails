@@ -4,8 +4,8 @@ import (
 	"slices"
 	"testing"
 
-	"server-monitor/internal/docker"
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 func ctr(name, project, service, state string, extra map[string]string) docker.Container {

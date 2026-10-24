@@ -20,8 +20,8 @@ import (
 	"sync"
 	"time"
 
-	"server-monitor/internal/alert"
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/alert"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 // Site is a site and its latest check.
@@ -81,7 +81,7 @@ func ParseCaddyfile(r io.Reader) []string {
 	return out
 }
 
-// ValidHost reports whether s is a hostname Harbor will check.
+// ValidHost reports whether s is a hostname StunSails will check.
 func ValidHost(s string) bool { return hostRe.MatchString(s) }
 
 func (c *Checker) clock() time.Time {
@@ -223,7 +223,7 @@ func Probe(ctx context.Context, cl *http.Client, host string, now time.Time) sto
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+host+"/", nil)
-	req.Header.Set("User-Agent", "Harbor uptime check")
+	req.Header.Set("User-Agent", "StunSails uptime check")
 	start := time.Now()
 	resp, err := cl.Do(req)
 	res.Ms = time.Since(start).Milliseconds()

@@ -21,7 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 // Rules an owner can switch on or off.
@@ -382,7 +382,7 @@ func (n *Notifier) Send(m Message) error {
 
 // Test sends a test message and waits for the result.
 func (n *Notifier) Test() error {
-	err := n.Send(Message{Rule: "test", Title: "Harbor test alert", Text: "Alerts from " + n.Host + " reach you here.", Severity: "info", Target: "test", At: n.now()})
+	err := n.Send(Message{Rule: "test", Title: "StunSails test alert", Text: "Alerts from " + n.Host + " reach you here.", Severity: "info", Target: "test", At: n.now()})
 	if errors.Is(err, errNoChannel) {
 		return errors.New("turn on email or the webhook first")
 	}
@@ -422,7 +422,7 @@ func (n *Notifier) postWebhook(u string, m Message) error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", "Harbor/2")
+	req.Header.Set("User-Agent", "StunSails/2")
 	resp, err := n.HTTP.Do(req)
 	if err != nil {
 		return err
@@ -437,8 +437,8 @@ func (n *Notifier) postWebhook(u string, m Message) error {
 // MailBody builds the RFC 5322 message.
 func MailBody(c SMTP, host string, m Message) []byte {
 	var b strings.Builder
-	subject := fmt.Sprintf("[Harbor] %s %s", icon(m.Severity), m.Title)
-	fmt.Fprintf(&b, "From: Harbor <%s>\r\n", c.From)
+	subject := fmt.Sprintf("[StunSails] %s %s", icon(m.Severity), m.Title)
+	fmt.Fprintf(&b, "From: StunSails <%s>\r\n", c.From)
 	fmt.Fprintf(&b, "To: %s\r\n", strings.Join(c.To, ", "))
 	fmt.Fprintf(&b, "Subject: %s\r\n", mimeWord(subject))
 	fmt.Fprintf(&b, "Date: %s\r\n", m.At.Format(time.RFC1123Z))

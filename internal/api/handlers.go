@@ -9,12 +9,12 @@ import (
 	"sync"
 	"time"
 
-	"server-monitor/internal/collector"
-	"server-monitor/internal/compose"
-	"server-monitor/internal/docker"
-	"server-monitor/internal/host"
-	"server-monitor/internal/hostlog"
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/collector"
+	"github.com/stunsails/stunsails/internal/compose"
+	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/stunsails/stunsails/internal/host"
+	"github.com/stunsails/stunsails/internal/hostlog"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 func dctx(r *http.Request) (context.Context, context.CancelFunc) {

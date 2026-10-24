@@ -1,4 +1,4 @@
-// Drop-in for "lucide-react" across Harbor, as in freelance-dashboard: the same names
+// Drop-in for "lucide-react" across StunSails, as in freelance-dashboard: the same names
 // and props, but each icon becomes the animated version (@animateicons/react) once
 // that set has loaded after start-up (see ./icons.tsx), and plays when the button,
 // link, menu item, tab or row it sits in is hovered or focused. Until then it is the

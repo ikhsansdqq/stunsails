@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 func TestParseCaddyfile(t *testing.T) {

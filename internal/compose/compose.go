@@ -2,7 +2,7 @@
 // runs `docker compose` for a stack inside a throwaway helper container. The
 // helper gets the stack's folder mounted read-only at the same path, so
 // relative binds and env files resolve as they did when the stack was started,
-// and Harbor itself never needs read access to anyone's home folder.
+// and StunSails itself never needs read access to anyone's home folder.
 //
 // Start, stop and restart skip the compose CLI and act on the stack's existing
 // containers through the Engine API. Compose would parse the whole file first,
@@ -21,8 +21,8 @@ import (
 	"strings"
 	"sync"
 
-	"server-monitor/internal/docker"
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 type Stack struct {

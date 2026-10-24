@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 func newNotifier(t *testing.T) (*Notifier, *[]Message, *time.Time) {
@@ -130,7 +130,7 @@ func TestWebhookDelivery(t *testing.T) {
 	if err := n.Test(); err != nil {
 		t.Fatal(err)
 	}
-	if got["title"] != "Harbor test alert" || !strings.Contains(got["content"].(string), "vps") || got["text"] != got["content"] {
+	if got["title"] != "StunSails test alert" || !strings.Contains(got["content"].(string), "vps") || got["text"] != got["content"] {
 		t.Fatalf("payload %+v", got)
 	}
 }
@@ -191,7 +191,7 @@ func TestSMTPDelivery(t *testing.T) {
 	for _, c := range port {
 		p = p*10 + int(c-'0')
 	}
-	err := sendMail(SMTP{Enabled: true, Host: host, Port: p, From: "harbor@x", To: []string{"me@x"}}, "vps",
+	err := sendMail(SMTP{Enabled: true, Host: host, Port: p, From: "stunsails@x", To: []string{"me@x"}}, "vps",
 		Message{Title: "Disk 93% full", Text: "Only 4 GB left.", Severity: "critical", Target: "/", At: time.Unix(1_800_000_000, 0)})
 	if err != nil {
 		t.Fatal(err)

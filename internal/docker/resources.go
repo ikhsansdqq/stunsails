@@ -383,7 +383,7 @@ func (c *Client) Pull(ctx context.Context, ref string, w io.Writer) error {
 	}
 }
 
-// RunSpec is a throwaway container Harbor starts for itself.
+// RunSpec is a throwaway container StunSails starts for itself.
 type RunSpec struct {
 	Image      string
 	Cmd        []string
@@ -401,7 +401,7 @@ func (c *Client) Run(ctx context.Context, spec RunSpec, w io.Writer) (int, error
 		"HostConfig": map[string]any{"Binds": spec.Binds, "NetworkMode": "host"},
 	}
 	var created struct{ Id string }
-	if err := c.call(ctx, http.MethodPost, "/containers/create", url.Values{"name": {"harbor-run-" + randName()}}, body, &created); err != nil {
+	if err := c.call(ctx, http.MethodPost, "/containers/create", url.Values{"name": {"stunsails-run-" + randName()}}, body, &created); err != nil {
 		return -1, err
 	}
 	id := created.Id

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"server-monitor/internal/docker"
-	"server-monitor/internal/store"
+	"github.com/stunsails/stunsails/internal/docker"
+	"github.com/stunsails/stunsails/internal/store"
 )
 
 func TestDue(t *testing.T) {

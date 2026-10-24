@@ -217,7 +217,7 @@ function OverviewTab({ d }: { d: Detail }) {
           />
         </Block>
       )}
-      <Section title="Environment" sub="Variable names only. Values often hold secrets, so Harbor never sends them to the browser.">
+      <Section title="Environment" sub="Variable names only. Values often hold secrets, so StunSails never sends them to the browser.">
         {d.env_keys.length ? (
           <div className="flex flex-wrap gap-1.5">
             {d.env_keys.map((k) => (

@@ -10,7 +10,7 @@ interface Ctx {
   setTheme: (t: Theme) => void;
 }
 const ThemeCtx = createContext<Ctx>({ theme: "system", resolved: "light", setTheme: () => {} });
-const KEY = "harbor-theme";
+const KEY = "stunsails-theme";
 
 function read(): Theme {
   return (readStored(KEY) as Theme | null) || "system";
